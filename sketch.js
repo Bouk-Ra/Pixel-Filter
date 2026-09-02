@@ -1,8 +1,13 @@
 let img;
 let shapeSelect;
 
-let spacingXSlider, spacingYSlider;
-let spaceXInput, spaceYInput;
+// 3. Image Resolution (Sampling)
+let sampleXSlider, sampleYSlider;
+let sampleXInput, sampleYInput;
+
+// 4. Display Spacing (Condensing)
+let displayXSlider, displayYSlider;
+let displayXInput, displayYInput;
 
 let widthSlider, heightSlider;
 let widthInput, heightInput;
@@ -25,7 +30,7 @@ function setup() {
   imgUploader.parent(imgGroup);
 
   // 2. Shape & Style Options
-  let shapeGroup = createDiv('2. Pixel Shape & Style').class('control-group');
+  let shapeGroup = createDiv('2. Shape & Style').class('control-group');
   shapeGroup.parent(controls);
   
   shapeSelect = createSelect();
@@ -35,35 +40,54 @@ function setup() {
   shapeSelect.parent(shapeGroup);
   shapeSelect.changed(() => redraw());
 
-  // Threshold Checkbox for uniform edges
   let checkRow = createDiv('').class('checkbox-row');
   checkRow.parent(shapeGroup);
-  thresholdCheckbox = createCheckbox(' Uniform Edge Pixel Size', false);
+  thresholdCheckbox = createCheckbox(' Uniform Edge Size', false);
   thresholdCheckbox.parent(checkRow);
   thresholdCheckbox.changed(() => redraw());
 
-  // 3. Spacing Control
-  let spaceGroup = createDiv('3. Pixel Spacing').class('control-group');
-  spaceGroup.parent(controls);
+  // 3. Image Resolution (Sample Spacing)
+  let sampleGroup = createDiv('3. Resolution (Pixels)').class('control-group');
+  sampleGroup.parent(controls);
   
-  let spaceXRow = createDiv('Horiz (X):').class('slider-row');
-  spaceXRow.parent(spaceGroup);
-  spacingXSlider = createSlider(5, 100, 15, 1);
-  spacingXSlider.parent(spaceXRow);
-  spaceXInput = createInput('15', 'number');
-  spaceXInput.parent(spaceXRow);
-  syncControl(spacingXSlider, spaceXInput);
+  let sampleXRow = createDiv('Horiz (X):').class('slider-row');
+  sampleXRow.parent(sampleGroup);
+  sampleXSlider = createSlider(5, 100, 15, 1);
+  sampleXSlider.parent(sampleXRow);
+  sampleXInput = createInput('15', 'number');
+  sampleXInput.parent(sampleXRow);
+  syncControl(sampleXSlider, sampleXInput);
   
-  let spaceYRow = createDiv('Vert (Y):').class('slider-row');
-  spaceYRow.parent(spaceGroup);
-  spacingYSlider = createSlider(5, 100, 15, 1);
-  spacingYSlider.parent(spaceYRow);
-  spaceYInput = createInput('15', 'number');
-  spaceYInput.parent(spaceYRow);
-  syncControl(spacingYSlider, spaceYInput);
+  let sampleYRow = createDiv('Vert (Y):').class('slider-row');
+  sampleYRow.parent(sampleGroup);
+  sampleYSlider = createSlider(5, 100, 15, 1);
+  sampleYSlider.parent(sampleYRow);
+  sampleYInput = createInput('15', 'number');
+  sampleYInput.parent(sampleYRow);
+  syncControl(sampleYSlider, sampleYInput);
 
-  // 4. Size Control
-  let sizeGroup = createDiv('4. Pixel Size').class('control-group');
+  // 4. Display Spacing (Condense) - NEW!
+  let displayGroup = createDiv('4. Display Spacing').class('control-group');
+  displayGroup.parent(controls);
+  
+  let displayXRow = createDiv('Horiz (X):').class('slider-row');
+  displayXRow.parent(displayGroup);
+  displayXSlider = createSlider(1, 100, 15, 1);
+  displayXSlider.parent(displayXRow);
+  displayXInput = createInput('15', 'number');
+  displayXInput.parent(displayXRow);
+  syncControl(displayXSlider, displayXInput);
+  
+  let displayYRow = createDiv('Vert (Y):').class('slider-row');
+  displayYRow.parent(displayGroup);
+  displayYSlider = createSlider(1, 100, 15, 1);
+  displayYSlider.parent(displayYRow);
+  displayYInput = createInput('15', 'number');
+  displayYInput.parent(displayYRow);
+  syncControl(displayYSlider, displayYInput);
+
+  // 5. Size Control
+  let sizeGroup = createDiv('5. Pixel Size').class('control-group');
   sizeGroup.parent(controls);
   
   let widthRow = createDiv('Width (W):').class('slider-row');
@@ -82,8 +106,8 @@ function setup() {
   heightInput.parent(heightRow);
   syncControl(heightSlider, heightInput);
 
-  // 5. Rotation Angle
-  let rotGroup = createDiv('5. Rotation Angle').class('control-group');
+  // 6. Rotation Angle
+  let rotGroup = createDiv('6. Rotation Angle').class('control-group');
   rotGroup.parent(controls);
   
   let rotRow = createDiv('0~360 deg:').class('slider-row');
@@ -94,7 +118,7 @@ function setup() {
   rotationInput.parent(rotRow);
   syncControl(rotationSlider, rotationInput);
 
-  // 6. Save SVG Button
+  // 7. Save SVG Button
   let btnGroup = createDiv('').class('control-group');
   btnGroup.style('background-color', 'transparent');
   btnGroup.style('border', 'none');
@@ -137,7 +161,7 @@ function exportSVG() {
     alert('Please upload an image first.');
     return;
   }
-  save("pixel_art_export.svg");
+  save("condensed_pixel_art.svg");
 }
 
 function draw() {
@@ -153,8 +177,14 @@ function draw() {
     return;
   }
 
-  let stepX = max(1, int(spacingXSlider.value())); 
-  let stepY = max(1, int(spacingYSlider.value())); 
+  // 3. Sampling (Resolution)
+  let sampleStepX = max(1, int(sampleXSlider.value())); 
+  let sampleStepY = max(1, int(sampleYSlider.value())); 
+  
+  // 4. Drawing (Condensing)
+  let displayStepX = max(1, int(displayXSlider.value())); 
+  let displayStepY = max(1, int(displayYSlider.value())); 
+
   let baseW = int(widthSlider.value());
   let baseH = int(heightSlider.value());
   let angle = radians(rotationSlider.value());
@@ -164,8 +194,19 @@ function draw() {
   fill(0);
   noStroke();
 
-  for (let y = 0; y < height; y += stepY) {
-    for (let x = 0; x < width; x += stepX) {
+  // Calculate total width/height to center the condensed artwork
+  let totalCols = Math.ceil(width / sampleStepX);
+  let totalRows = Math.ceil(height / sampleStepY);
+  let totalDrawWidth = totalCols * displayStepX;
+  let totalDrawHeight = totalRows * displayStepY;
+  
+  let offsetX = (width - totalDrawWidth) / 2;
+  let offsetY = (height - totalDrawHeight) / 2;
+
+  let gridY = 0;
+  for (let y = 0; y < height; y += sampleStepY) {
+    let gridX = 0;
+    for (let x = 0; x < width; x += sampleStepX) {
       
       let imgX = floor(map(x, 0, width, 0, img.width));
       let imgY = floor(map(y, 0, height, 0, img.height));
@@ -196,7 +237,11 @@ function draw() {
       if (w > 0.5 || h > 0.5) {
         push(); 
         
-        translate(x + stepX / 2, y + stepY / 2);
+        // Calculate condensed drawing positions and center them
+        let drawX = offsetX + (gridX * displayStepX);
+        let drawY = offsetY + (gridY * displayStepY);
+
+        translate(drawX + displayStepX / 2, drawY + displayStepY / 2);
         rotate(angle);
 
         if (selectedShape === 'Triangle (Mountain)') {
@@ -206,7 +251,6 @@ function draw() {
           let y2 = h / 2;
           let x3 = 0;
           let y3 = -h / 2;
-          
           triangle(x1, y1, x2, y2, x3, y3);
         } 
         else if (selectedShape === 'Rectangle') {
@@ -220,6 +264,8 @@ function draw() {
         
         pop();
       }
+      gridX++;
     }
+    gridY++;
   }
 }

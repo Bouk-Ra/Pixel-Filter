@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Shape Pixelator</title>
+  <!-- p5.js Core Library (Version 1.4.2 fixed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <!-- p5.js SVG Library -->
+  <script src="https://unpkg.com/p5.js-svg@1.5.1"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+    }
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      align-items: flex-start;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: #fafafa;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    .slider-row {
+      display: grid;
+      grid-template-columns: 80px 100px 50px; 
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+      font-size: 13px;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      font-size: 13px;
+    }
+    canvas {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background-color: white;
+    }
+    select, input[type="file"], input[type="number"] {
+      padding: 4px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 15px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover { background-color: #555; }
+  </style>
+</head>
+<body>
+  <div id="controls" class="controls"></div>
+  <script src="sketch.js"></script>
+</body>
+</html>
